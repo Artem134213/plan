@@ -7,17 +7,6 @@ using System.Threading.Tasks;
 namespace IU.PlanManeger.ConApp.Models
 {
     /// <summary>
-    /// интерфейс сущности
-    /// </summary>
-    public interface IEntity
-    {
-        /// <summary>
-        /// Идентификатор
-        /// </summary>
-        Guid Uid { get; set; }
-    }
-
-    /// <summary>
     /// Интерфейс хранилища
     /// </summary>
     public interface IStore<T> where T : class, IEntity

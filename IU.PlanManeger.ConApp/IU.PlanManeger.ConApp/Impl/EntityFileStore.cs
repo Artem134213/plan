@@ -3,38 +3,46 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.IO; 
 
 namespace IU.PlanManeger.ConApp.Models
 {
     /// <summary>
-    /// Хранилище событий <see cref="Event"/>
+    /// Хранилище событий <see cref="T"/>
     /// </summary>
-    public class EventStore : IStore<Event>
+    public class BaseFileStore<T> : IStore<T> where T : class, IEntity
     {
+        private string fileName = "C:\\{0}.json";
+
         /// <summary>
         /// ctor
         /// </summary>
-        public EventStore()
+        public BaseFileStore()
         {
-            Events = new List<Event>();
+            entitys = new List<T>();
+        }
+
+        public virtual void Init()
+        {
+            fileName = string.Format(fileName, typeof(T).Name.ToLower());
         }
 
         /// <summary>
         /// Список событий
         /// </summary>
-        private List<Event> Events { get; }
+        private List<T> entitys { get; }
 
-        public IEnumerable<Event> Entities => Events;
+        public IEnumerable<T> Entities => entitys;
 
         /// <summary>
         /// Добавить событие
         /// </summary>
         /// <param name="evt">Событие</param>
-        public void Add(Event evt)
+        public virtual void Add(T evt)
         {
             if(evt != null)
             {
-                Events.Add(evt);
+                entitys.Add(evt);
             }
 
         }
@@ -43,16 +51,16 @@ namespace IU.PlanManeger.ConApp.Models
         /// Получить событие
         /// </summary>
         /// <param name="uid">Id события</param>
-        public Event Get(Guid uid)
+        public virtual T Get(Guid uid)
         {
-            return Events.FirstOrDefault(evt => evt.Uid == uid);
+            return entitys.FirstOrDefault(evt => evt.Uid == uid);
         }
 
         /// <summary>
         /// Обновить событие
         /// </summary>
         /// <param name="evt"></param>
-        public void Update(Event evt)
+        public virtual void Update(T evt)
         {
             Delete(evt.Uid);
             Add(evt);
@@ -62,12 +70,12 @@ namespace IU.PlanManeger.ConApp.Models
         /// Удалть событие
         /// </summary>
         /// <param name="evt"></param>
-        public void Delete(Guid uid)
+        public virtual void Delete(Guid uid)
         {
             var elem = Get(uid);
             if (elem != null)
             {
-                Events.Remove(elem);
+                entitys.Remove(elem);
             }
         }
     }
