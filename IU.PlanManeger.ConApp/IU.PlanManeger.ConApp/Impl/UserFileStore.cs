@@ -1,24 +1,25 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace IU.PlanManeger.ConApp.Models
+namespace IU.PlanManager.ConApp.Models
 {
     /// <summary>
     /// Хранилище событий <see cref="User"/>
     /// </summary>
     public class UserFileStore : BaseFileStore<User>, IUserStore
     {
+        /// <inheritdoc/>
         public IEnumerable<User> GetByName(string username)
         {
             return Entities.Where(
-                user => 
+                user =>
                 user.Status != UserStatus.Deleted &&
-                user.Name.Contains(username));
+                user.Name.Contains(username)
+            );
         }
 
+        /// <inheritdoc/>
         public override User Get(Guid uid)
         {
             var user = base.Get(uid);
@@ -29,6 +30,7 @@ namespace IU.PlanManeger.ConApp.Models
             return user;
         }
 
+        /// <inheritdoc/>
         public override void Delete(Guid uid)
         {
             var user = Get(uid);

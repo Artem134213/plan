@@ -1,0 +1,115 @@
+﻿@model CalendarViewModel
+@using IU.Plan.Web.Models
+
+@{
+    ViewBag.Title = "Календарь";
+
+    var today = DateTime.Today;
+    var count = 0;
+
+    var prev = Model.StartDay.AddMonths(-1);
+    var next = Model.StartDay.AddMonths(1);
+
+    var colStart = Model.StartDay.DayOfWeek.ToInt();
+}
+
+
+@helper PrintEvents(int dayNumber, DateTime today)
+    {
+        <ul class="list-group">
+            @if (dayNumber < Model.Limit)
+            {
+                DateTime day = new DateTime(today.Year, today.Month, dayNumber, 0, 0, 0);
+
+                var dayEvents = Model.Events.Where(evt => evt.StartDate == day);
+                foreach (var dayEvent in dayEvents)
+                {
+                    <li class="list-group-item list-group-item-info">
+                        @Html.ActionLink(dayEvent.Title, "Details", "Event", new { uid = dayEvent.Uid }, null)
+
+                        <button onclick="getDetails('@dayEvent.Uid')">click</button>
+                    </li>
+                }
+            }
+        </ul>
+}
+
+@helper PrintCell(int count, DateTime today)
+    {
+        var tdClass = Model.StartDay.AddDays(count - 1) == today ? "bg-danger" : "";
+        <td class="@(tdClass)">
+            @(count <= Model.Limit ? $"{count}" : "")
+            @PrintEvents(count, today)
+        </td>
+}
+
+<script type="text/javascript">
+    function getDetails(uid) {
+        console.log(uid);
+
+        $.ajax({
+            url: '/Event/MiniDetails?uid=' + uid,
+            success: function (data) {
+                $('#MiniDetailsResult').html(data);
+
+                $("#MiniDetailsResult").dialog({
+                    modal: true,
+                    buttons: {
+                        Ok: function () {
+                            $(this).dialog("close");
+                        }
+                    }
+                });
+            }
+        });
+
+    }
+</script>
+
+<h2>
+    Календарь
+    @Model.StartDay.ToString("MMMM")
+    @Model.StartDay.Year
+</h2>
+
+<nav aria-label="...">
+    <ul class="pager">
+        <li class="previous"><a href="@Url.Action("Index", new { year = prev.Year, month = prev.Month })"><span aria-hidden="true">&larr;</span> Туда</a></li>
+        <li class="today"><a href="@Url.Action("Index", new { year = today.Year, month = today.Month })">Сегодня</a></li>
+        <li class="next"><a href="@Url.Action("Index", new { year = next.Year, month = next.Month })">Сюда <span aria-hidden="true">&rarr;</span></a></li>
+    </ul>
+</nav>
+
+<div class="table-responsive" style="width:900px">
+
+    <table class="table table-bordered">
+        <tr>
+            <th>понедельник</th>
+            <th>вторник</th>
+            <th>среда</th>
+            <th>четверг</th>
+            <th>пятница</th>
+            <th>суббота</th>
+            <th>воскресенье</th>
+        </tr>
+        @for (int i = 0; i < Model.RowCount; i++)
+        {
+            var start = i == 0 ? colStart : 0;
+            <tr data-info="@start  @Model.ColCount">
+                @for (int j = 0; j < start; j++)
+                {
+                    <td></td>
+                }
+                @for (int j = start; j < Model.ColCount; j++)
+                {
+                    @PrintCell(++count, today)
+                }
+            </tr>
+        }
+    </table>
+
+</div>
+
+<div id="MiniDetailsResult">
+
+</div>

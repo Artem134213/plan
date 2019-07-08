@@ -1,10 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace IU.PlanManeger.ConApp.Models
+namespace IU.PlanManager.ConApp.Models
 {
     /// <summary>
     /// Событие
@@ -18,11 +15,12 @@ namespace IU.PlanManeger.ConApp.Models
         {
             Uid = Guid.NewGuid();
         }
+
         /// <inheritdoc/>
         public Guid Uid { get; set; }
 
         /// <summary>
-        /// Заголовок 
+        /// Заголовок
         /// </summary>
         public string Title { get; set; }
 
@@ -42,8 +40,17 @@ namespace IU.PlanManeger.ConApp.Models
         public DateTime? EndDate { get; set; }
 
         /// <summary>
-        /// Место
+        /// Место 
         /// </summary>
         public string Place { get; set; }
+
+        public override string ToString()
+        {
+            var fields = new List<string>() { StartDate?.ToShortDateString(), Title , Place};
+
+            fields.RemoveAll(s => string.IsNullOrWhiteSpace(s));
+
+            return string.Join(", ", fields);
+        }
     }
 }

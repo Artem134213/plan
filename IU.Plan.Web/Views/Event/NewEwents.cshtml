@@ -1,0 +1,31 @@
+﻿@model IU.PlanManeger.Dll.Models.Event
+
+@{
+    ViewBag.Title = "NewEvents";
+}
+<link href="~/Content/Details.css" rel="stylesheet">
+<div style="background:#abfcd9">
+    <h4>New Event</h4>
+    <hr />
+    <dl class="dl-horizontal">
+        <dt>
+            @Html.DisplayNameFor(model => model.Title) <input type="text" size="15">
+        </dt>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Description) <input type="text" size="15">
+        </dt>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.StartDate) <input type="text" size="15">
+        </dt>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.EndDate) <input type="text" size="15">
+        </dt>
+
+        <dt>
+            @Html.DisplayNameFor(model => model.Place) <input type="text" size="15">
+        </dt>
+    </dl>
+</div>

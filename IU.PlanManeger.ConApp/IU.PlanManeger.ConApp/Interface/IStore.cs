@@ -1,15 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace IU.PlanManeger.ConApp.Models
+namespace IU.PlanManager.ConApp
 {
     /// <summary>
     /// Интерфейс хранилища
     /// </summary>
-    public interface IStore<T> where T : class, IEntity
+    public interface IStore<T> where T : IEntity
     {
         /// <summary>
         /// Список сущностей
@@ -17,27 +14,28 @@ namespace IU.PlanManeger.ConApp.Models
         IEnumerable<T> Entities { get; }
 
         /// <summary>
-        /// evt событие
+        /// Добавить сущность
         /// </summary>
-        /// <param name="entity">Событие</param>
+        /// <param name="entity">Сущность</param>
         void Add(T entity);
 
         /// <summary>
-        /// Получить событие
+        /// Получить сущность
         /// </summary>
-        /// <param name="uid">Id события</param>
+        /// <param name="uid">ID сущности</param>
         T Get(Guid uid);
 
         /// <summary>
-        /// Обновить событие
+        /// Обновить сущность
         /// </summary>
         /// <param name="entity">Сущность</param>
         void Update(T entity);
 
         /// <summary>
-        /// Удалть событие
+        /// Удалить сущность
         /// </summary>
-        /// <param name="uid">Id сущности</param>
+        /// <param name="uid">ID сущности</param>
         void Delete(Guid uid);
+
     }
 }

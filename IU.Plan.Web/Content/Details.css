@@ -1,0 +1,53 @@
+﻿dl {
+    margin-bottom: 20px;
+}
+
+dt,
+dd {
+    line-height: 1.5;
+}
+
+dt {
+    font-weight: bold;
+    margin-right: 20px;
+}
+
+dd {
+    margin-left: 40px;
+}
+
+@media (min-width: 800px) {
+    .dl-horizontal dt {
+        clear: left;
+        float: left;
+        width: auto;
+        overflow: hidden;
+        text-align: left;
+        text-overflow: ellipsis;
+        white-space: nowrap;
+    }
+
+    .dl-horizontal dd {
+        margin-left: 20px;
+    }
+
+        .dl-horizontal dd:before,
+        .dl-horizontal dd:after {
+            display: table;
+            content: " ";
+        }
+
+        .dl-horizontal dd:after {
+            clear: both;
+        }
+
+        .dl-horizontal dd:before,
+        .dl-horizontal dd:after {
+            display: table;
+            content: " ";
+        }
+
+        .dl-horizontal dd:after {
+            clear: both;
+        }
+}

@@ -1,16 +1,13 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 
-namespace IU.PlanManeger.ConApp.Models
+namespace IU.PlanManager.ConApp.Models
 {
+    /// <summary>
+    /// Пользователь
+    /// </summary>
     public class User : IEntity
     {
-        /// <summary>
-        /// Id пользователя
-        /// </summary>
+        /// <inheritdoc/>
         public Guid Uid { get; set; }
 
         /// <summary>
@@ -27,9 +24,9 @@ namespace IU.PlanManeger.ConApp.Models
         /// Фото
         /// </summary>
         public string Photo { get; set; }
-
+        
         /// <summary>
-        /// Почта
+        /// Email
         /// </summary>
         public string Email { get; set; }
 
@@ -62,18 +59,19 @@ namespace IU.PlanManeger.ConApp.Models
     /// Пол
     /// </summary>
     public enum Gender
-    { 
+    {
         /// <summary>
-        /// Необпределено
+        /// Неопределено
         /// </summary>
         Undefined,
         /// <summary>
-        /// Мужчина
+        /// Мужской
         /// </summary>
-        Men,
+        Man,
         /// <summary>
-        /// Женщина
+        /// Женский
         /// </summary>
-        Women
+        Woman,
+
     }
 }

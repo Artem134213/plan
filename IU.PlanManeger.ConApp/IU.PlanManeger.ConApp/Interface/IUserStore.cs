@@ -1,11 +1,7 @@
-﻿using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
-using IU.PlanManeger.ConApp.Models;
+﻿using System.Collections.Generic;
+using IU.PlanManager.ConApp.Models;
 
-namespace IU.PlanManeger.ConApp
+namespace IU.PlanManager.ConApp
 {
     /// <summary>
     /// Интерфейс хранилища
@@ -16,7 +12,6 @@ namespace IU.PlanManeger.ConApp
         /// Получить пользователей по имени
         /// </summary>
         /// <param name="username">Имя пользователя</param>
-        /// <returns></returns>
         IEnumerable<User> GetByName(string username);
     }
 }
