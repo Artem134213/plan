@@ -10,13 +10,18 @@
     var prev = Model.StartDay.AddMonths(-1);
     var next = Model.StartDay.AddMonths(1);
 
-    var colStart = Model.StartDay.DayOfWeek.ToInt();
+    var colStart = Model.StartDay.DayOfWeek.ToInt() - 1;
 }
-
-
+<style>
+    .overtext {
+        text-overflow: ellipsis;
+        overflow: hidden;
+        max-width: 80px;
+    }
+</style>
 @helper PrintEvents(int dayNumber, DateTime today)
     {
-        <ul class="list-group">
+        <div>
             @if (dayNumber < Model.Limit)
             {
                 DateTime day = new DateTime(today.Year, today.Month, dayNumber, 0, 0, 0);
@@ -24,14 +29,14 @@
                 var dayEvents = Model.Events.Where(evt => evt.StartDate == day);
                 foreach (var dayEvent in dayEvents)
                 {
-                    <li class="list-group-item list-group-item-info">
-                        @Html.ActionLink(dayEvent.Title, "Details", "Event", new { uid = dayEvent.Uid }, null)
-
-                        <button onclick="getDetails('@dayEvent.Uid')">click</button>
-                    </li>
+                    <div>
+                        <a href="#" class="btn btn-primary btn-xs overtext" title="@dayEvent.Title" onclick="getDetails('@dayEvent.Uid')">
+                            @dayEvent.Title
+                        </a>
+                    </div>
                 }
             }
-        </ul>
+        </div>
 }
 
 @helper PrintCell(int count, DateTime today)
@@ -45,8 +50,6 @@
 
 <script type="text/javascript">
     function getDetails(uid) {
-        console.log(uid);
-
         $.ajax({
             url: '/Event/MiniDetails?uid=' + uid,
             success: function (data) {
@@ -54,10 +57,53 @@
 
                 $("#MiniDetailsResult").dialog({
                     modal: true,
+                    width: 'auto',
                     buttons: {
+                        "Редактировать": function () {
+                            openEditPopup(uid);
+                        },
                         Ok: function () {
                             $(this).dialog("close");
                         }
+                    }
+                });
+            }
+        });
+
+    }
+
+    function saveEvent() {
+        $.ajax({
+            url: '/Event/Save',
+            type: 'post',
+            data: $('form#eventSaveForm').serialize(),
+            success: function (data) {
+                $('#EditPopup').html(data);
+            }
+        });
+
+    }
+
+    function openEditPopup(uid) {
+
+        $.ajax({
+            url: '/Event/Edit?uid=' + uid,
+            success: function (data) {
+                $('#EditPopup').html(data);
+                $("#EditPopup").dialog({
+                    modal: true,
+                    width: 'auto',
+                    buttons: {
+                        "Сохранить": function () {
+                            saveEvent();
+                            //$(this).dialog("close");
+                        },
+                        Cancel: function () {
+                            $(this).dialog("close");
+                        }
+                    },
+                    close: function () {
+                        //form[0].reset();
                     }
                 });
             }
@@ -72,44 +118,81 @@
     @Model.StartDay.Year
 </h2>
 
-<nav aria-label="...">
-    <ul class="pager">
-        <li class="previous"><a href="@Url.Action("Index", new { year = prev.Year, month = prev.Month })"><span aria-hidden="true">&larr;</span> Туда</a></li>
-        <li class="today"><a href="@Url.Action("Index", new { year = today.Year, month = today.Month })">Сегодня</a></li>
-        <li class="next"><a href="@Url.Action("Index", new { year = next.Year, month = next.Month })">Сюда <span aria-hidden="true">&rarr;</span></a></li>
-    </ul>
-</nav>
-
-<div class="table-responsive" style="width:900px">
-
-    <table class="table table-bordered">
-        <tr>
-            <th>понедельник</th>
-            <th>вторник</th>
-            <th>среда</th>
-            <th>четверг</th>
-            <th>пятница</th>
-            <th>суббота</th>
-            <th>воскресенье</th>
-        </tr>
-        @for (int i = 0; i < Model.RowCount; i++)
-        {
-            var start = i == 0 ? colStart : 0;
-            <tr data-info="@start  @Model.ColCount">
-                @for (int j = 0; j < start; j++)
-                {
-                    <td></td>
-                }
-                @for (int j = start; j < Model.ColCount; j++)
-                {
-                    @PrintCell(++count, today)
-                }
-            </tr>
-        }
-    </table>
-
+<div class="row">
+    <div class="col-md-8">
+        <nav aria-label="...">
+            <ul class="pager">
+                <li class="previous"><a href="@Url.Action("Index", new { year = prev.Year, month = prev.Month })"><span aria-hidden="true">&larr;</span> Туда</a></li>
+                <li class="today"><a href="@Url.Action("Index", new { year = today.Year, month = today.Month })">Сегодня</a></li>
+                <li class="next"><a href="@Url.Action("Index", new { year = next.Year, month = next.Month })">Сюда <span aria-hidden="true">&rarr;</span></a></li>
+            </ul>
+        </nav>
+    </div>
+    <div class="col-md-4">
+        <form class="form-inline">
+            <div class="form-group">
+                <input type="search" class="form-control" id="search" placeholder="найти...">
+            </div>
+            <button type="submit" class="btn btn-default">go</button>
+        </form>
+    </div>
 </div>
 
+<div class="row">
+    <div class="col-md-8">
+        <table class="table table-hover table-bordered">
+            <thead>
+                <tr>
+                    <th style="width:14%">ПН</th>
+                    <th style="width:14%">ВТ</th>
+                    <th style="width:14%">СР</th>
+                    <th style="width:14%">ЧТ</th>
+                    <th style="width:14%">ПТ</th>
+                    <th style="width:15%">СБ</th>
+                    <th style="width:15%">ВС</th>
+                </tr>
+            </thead>
+            <tbody>
+                @for (int i = 0; i < Model.RowCount; i++)
+                {
+                    var start = i == 0 ? colStart : 0;
+                    <tr data-info="@start  @Model.ColCount">
+                        @for (int j = 0; j < start; j++)
+                        {
+                            <td></td>
+                        }
+                        @for (int j = start; j < Model.ColCount; j++)
+                        {
+                            @PrintCell(++count, today)
+                        }
+                    </tr>
+                }
+            </tbody>
+        </table>
+
+    </div>
+
+    <div class="col-md-4">
+        <ul class="list-group">
+            <li class="list-group-item">
+                task
+            </li>
+            <li class="list-group-item">
+                task
+            </li>
+            <li class="list-group-item">
+                task
+            </li>
+            <li class="list-group-item"></li>
+            <li class="list-group-item">
+                task
+            </li>
+        </ul>
+    </div>
+</div>
 <div id="MiniDetailsResult">
+
+</div>
+<div id="EditPopup">
 
 </div>

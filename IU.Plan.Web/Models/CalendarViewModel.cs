@@ -4,20 +4,6 @@ using IU.PlanManeger.Dll.Models;
 
 namespace IU.Plan.Web.Models
 {
-
-    public static class DayOfWeekExtension
-    {
-        /// <summary>
-        /// Возвращает числовой код дня от 1 до 7
-        /// </summary>
-        /// <param name="dayOfWeek"></param>
-        /// <returns></returns>
-        public static int ToInt(this DayOfWeek dayOfWeek)
-        {
-            return dayOfWeek == 0 ? 7 : (int)dayOfWeek - 1;
-        }
-    }
-
     public class CalendarViewModel
     {
         public CalendarViewModel()

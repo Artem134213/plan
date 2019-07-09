@@ -19,26 +19,33 @@ namespace IU.Plan.Web.Binding
             return string.Compare("yearmonthday", prefix, true) == 0;
         }
 
+        private int? GetIntFromRequest(string name)
+        {
+            var requestItem = controllerContext.RequestContext.RouteData.Values[name];
+            if (requestItem == null)
+            {
+                requestItem = controllerContext.HttpContext.Request.Params[name];
+            }
+
+            if (requestItem == null)
+            {
+                return null;
+            }
+
+            var requestItemStr = requestItem.ToString();
+
+            if (int.TryParse(requestItemStr, out int result))
+            {
+                return result;
+            }
+            return null;
+        }
+
         public ValueProviderResult GetValue(string key)
         {
-            var yearStr = "";// controllerContext.RequestContext.RouteData.Values["year"].ToString();
-            var monthStr = "";// controllerContext.RequestContext.RouteData.Values["month"].ToString();
-            var dayStr = "";// controllerContext.RequestContext.RouteData.Values["day"].ToString();
-
-            if (!int.TryParse(yearStr, out int year))
-            {
-                year = DateTime.Today.Year;
-            }
-
-            if (!int.TryParse(monthStr, out int month))
-            {
-                month = DateTime.Today.Month;
-            }
-
-            if (!int.TryParse(dayStr, out int day))
-            {
-                day = 1;
-            }
+            var year = GetIntFromRequest("year") ?? DateTime.Today.Year;
+            var month = GetIntFromRequest("month") ?? DateTime.Today.Month;
+            var day = GetIntFromRequest("day") ?? 1;
 
             var value = new DateTime(year, month, day);
 
