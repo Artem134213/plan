@@ -30,7 +30,7 @@ namespace IU.Plan.Web.Models
             Place = evt.Place;
         }
 
-        public Event GetEvent()
+        public virtual Event GetEvent()
         {
             return new Event()
             {

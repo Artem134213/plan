@@ -1,26 +1,18 @@
-﻿using System;
+﻿using IU.Plan.Web.Models;
+using IU.Plan.Web.NH;
+using IU.PlanManager.Extensions;
+using IU.PlanManeger.Dll;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Web;
 using System.Web.Mvc;
-using IU.Plan.Web.Models;
-using IU.Plan.Web.NH;
-using IU.PlanManeger.Dll;
-using IU.PlanManeger.Dll.Models;
 
 namespace IU.Plan.Web.Controllers
 {
-    public class EventController : Controller
+    public class ActivityController : Controller
     {
-        private IStore<Event> store = new EventDBStore<Event>();
-
-        // GET: Event
-        public ActionResult Details(Guid uid)
-        {
-            var evt = store.Get(uid);
-
-            return View(evt);
-        }
+        private IStore<Activity> store = new EventDBStore<Activity>();
 
         public PartialViewResult MiniDetails(Guid uid)
         {
@@ -32,11 +24,11 @@ namespace IU.Plan.Web.Controllers
         // GET: Event
         public PartialViewResult Create()
         {
-            var evt = new Event();
+            var evt = new Activity();
 
-            var model = new EventEditModel(evt);
+            var model = new ActivityEditModel(evt);
 
-            return PartialView("EventEdit", model);
+            return PartialView("Edit", model);
         }
 
         // GET: Event
@@ -44,13 +36,13 @@ namespace IU.Plan.Web.Controllers
         {
             var evt = store.Get(uid);
 
-            var model = new EventEditModel(evt);
+            var model = new ActivityEditModel(evt);
 
-            return PartialView("EventEdit", model);
+            return PartialView("Edit", model);
         }
 
         [HttpPost]
-        public PartialViewResult Save(EventEditModel model)
+        public PartialViewResult Save(ActivityEditModel model)
         {
             if (ModelState.IsValid)
             {
@@ -66,9 +58,8 @@ namespace IU.Plan.Web.Controllers
                 }
             }
 
-            return PartialView("EventEdit", model);
+            return PartialView("Edit", model);
         }
-
 
         [HttpPost]
         public JsonResult Delete(Guid uid)

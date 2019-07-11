@@ -1,4 +1,4 @@
-﻿@model IU.Plan.Web.Models.EventEditModel
+﻿@model IU.Plan.Web.Models.ActivityEditModel
 
 @{
     string saveResult = ViewBag.SaveResult;
@@ -12,7 +12,7 @@
 }
 else
 {
-    using (Html.BeginForm("Save", "Event", FormMethod.Post, new { style = "width:500px", id = "EventSaveForm" }))
+    using (Html.BeginForm("Save", "Activity", FormMethod.Post, new { style = "width:500px", id = "ActivitySaveForm" }))
     {
         @Html.AntiForgeryToken()
 
@@ -60,6 +60,33 @@ else
                     @Html.ValidationMessageFor(model => model.Place, "", new { @class = "text-danger" })
                 </div>
             </div>
+
+            @Html.EditorFor(model => model.BudgetUid)
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.Budget.Currency, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.Budget.Currency, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(model => model.Budget.Currency, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.Budget.Value, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.Budget.Value, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(model => model.Budget.Value, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
+            <div class="form-group">
+                @Html.LabelFor(model => model.PeopleAmount, htmlAttributes: new { @class = "control-label col-md-2" })
+                <div class="col-md-10">
+                    @Html.EditorFor(model => model.PeopleAmount, new { htmlAttributes = new { @class = "form-control" } })
+                    @Html.ValidationMessageFor(model => model.PeopleAmount, "", new { @class = "text-danger" })
+                </div>
+            </div>
+
         </div>
     }
 }

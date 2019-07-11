@@ -11,7 +11,13 @@
     var next = Model.StartDay.AddMonths(1);
 
     var colStart = Model.StartDay.DayOfWeek.ToInt() - 1;
+    var acts = ViewBag.acts as IU.PlanManager.Extensions.Activity;
 }
+@ViewBag.Error
+
+<span class="alert-info">
+    @*@(acts?.Budget?.Value) @(acts?.Budget?.Currency)*@
+</span>
 <style>
     .overtext {
         text-overflow: ellipsis;
@@ -27,10 +33,12 @@
                 DateTime day = new DateTime(today.Year, today.Month, dayNumber, 0, 0, 0);
 
                 var dayEvents = Model.Events.Where(evt => evt.StartDate == day);
+
                 foreach (var dayEvent in dayEvents)
                 {
+                    var type = dayEvent.GetType().Name;
                     <div>
-                        <a href="#" class="btn btn-primary btn-xs overtext" title="@dayEvent.Title" onclick="getDetails('@dayEvent.Uid')">
+                        <a href="#" class="btn btn-primary btn-xs overtext" title="@dayEvent.Title" onclick="getDetails('@type', '@dayEvent.Uid')">
                             @dayEvent.Title
                         </a>
                     </div>
@@ -43,15 +51,20 @@
     {
         var tdClass = Model.StartDay.AddDays(count - 1) == today ? "bg-danger" : "";
         <td class="@(tdClass)">
-            @(count <= Model.Limit ? $"{count}" : "")
+            <div style="display:inline;">
+                @(count <= Model.Limit ? $"{count}" : "")
+                <a href="#" onclick="openCreatePopup('Event')">+</a>
+                <a href="#" onclick="openCreatePopup('Activity')">+</a>
+                <a href="#" onclick="openCreatePopup('Task')">+</a>
+            </div>
             @PrintEvents(count, today)
         </td>
 }
 
 <script type="text/javascript">
-    function getDetails(uid) {
+    function getDetails(type, uid) {
         $.ajax({
-            url: '/Event/MiniDetails?uid=' + uid,
+            url: '/' + type + '/MiniDetails?uid=' + uid,
             success: function (data) {
                 $('#MiniDetailsResult').html(data);
 
@@ -60,7 +73,12 @@
                     width: 'auto',
                     buttons: {
                         "Редактировать": function () {
-                            openEditPopup(uid);
+                            $(this).dialog("close");
+                            openEditPopup(type, uid);
+                        },
+                        "Удалить": function () {
+                            $(this).dialog("close");
+                            deleteEvent(type, uid);
                         },
                         Ok: function () {
                             $(this).dialog("close");
@@ -69,47 +87,97 @@
                 });
             }
         });
-
     }
 
-    function saveEvent() {
+    function deleteEvent(type, uid, callback) {
         $.ajax({
-            url: '/Event/Save',
+            url: '/' + type + '/Delete',
             type: 'post',
-            data: $('form#eventSaveForm').serialize(),
+            data: { "uid": uid },
             success: function (data) {
-                $('#EditPopup').html(data);
+                if (data.Error) {
+                    alert(data.Error);
+                }
+                else if (callback) {
+                    setTimeout(callback, 1 * 1000);
+                }
             }
         });
-
     }
 
-    function openEditPopup(uid) {
-
+    function saveEvent(type, callback) {
         $.ajax({
-            url: '/Event/Edit?uid=' + uid,
+            url: '/' + type + '/Save',
+            type: 'post',
+            data: $('form#' + type + 'SaveForm').serialize(),
             success: function (data) {
                 $('#EditPopup').html(data);
-                $("#EditPopup").dialog({
+                if (callback) {
+                    setTimeout(callback, 1 * 1000);
+                }
+            }
+        });
+    }
+
+    function openCreatePopup(type) {
+        $.ajax({
+            url: '/' + type + '/Create',
+            success: function (data) {
+                $('#EditPopup').html(data);
+                var editPopup = $("#EditPopup").dialog({
                     modal: true,
                     width: 'auto',
                     buttons: {
                         "Сохранить": function () {
-                            saveEvent();
-                            //$(this).dialog("close");
+                            saveEvent(type, function () {
+                                editPopup.dialog("close");
+                                //document.location.reload();
+                            });
                         },
                         Cancel: function () {
                             $(this).dialog("close");
                         }
-                    },
-                    close: function () {
-                        //form[0].reset();
                     }
                 });
             }
         });
-
     }
+
+    function openEditPopup(type, uid) {
+        $.ajax({
+            url: '/' + type + '/Edit?uid=' + uid,
+            success: function (data) {
+                $('#EditPopup').html(data);
+                var editPopup = $("#EditPopup").dialog({
+                    modal: true,
+                    width: 'auto',
+                    buttons: {
+                        "Сохранить": function () {
+                            saveEvent(type, function () {
+                                editPopup.dialog("close");
+                                document.location.reload();
+                            });
+                        },
+                        Cancel: function () {
+                            $(this).dialog("close");
+                        }
+                    }
+                });
+            }
+        });
+    }
+
+    function search() {
+        $.ajax({
+            url: '/Search/Filter',
+            type: 'post',
+            data: { "searchRequest": $("#searchRequest").val() },
+            success: function (data) {
+                $('#searchResult').html(data);
+            }
+        });
+    }
+
 </script>
 
 <h2>
@@ -129,12 +197,14 @@
         </nav>
     </div>
     <div class="col-md-4">
-        <form class="form-inline">
+
+        <form class="form-inline" onsubmit="search(); return false;">
             <div class="form-group">
-                <input type="search" class="form-control" id="search" placeholder="найти...">
+                <input type="search" class="form-control" id="searchRequest" placeholder="найти...">
             </div>
-            <button type="submit" class="btn btn-default">go</button>
+            <input type="submit" class="btn btn-default" value="go" />
         </form>
+
     </div>
 </div>
 
@@ -172,22 +242,8 @@
 
     </div>
 
-    <div class="col-md-4">
-        <ul class="list-group">
-            <li class="list-group-item">
-                task
-            </li>
-            <li class="list-group-item">
-                task
-            </li>
-            <li class="list-group-item">
-                task
-            </li>
-            <li class="list-group-item"></li>
-            <li class="list-group-item">
-                task
-            </li>
-        </ul>
+    <div id="searchResult" class="col-md-4">
+
     </div>
 </div>
 <div id="MiniDetailsResult">

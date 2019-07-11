@@ -17,13 +17,11 @@
                     <span class="icon-bar"></span>
                 </button>
                 @Html.ActionLink("Планировщик", "Index", "Calendar", new { area = "" }, new { @class = "navbar-brand" })
-                <div id="notify"></div>
             </div>
             <div class="navbar-collapse collapse">
                 <ul class="nav navbar-nav">
-                    <li>@Html.ActionLink("Home", "Index", "Home")</li>
-                    <li>@Html.ActionLink("About", "About", "Home")</li>
-                    <li>@Html.ActionLink("Contact", "Contact", "Home")</li>
+                    <li id="notify_today"><a>Сегодня <span class="badge"></span></a></li>
+                    <li id="notify"><a>Завтра <span class="badge"></span></a></li>
                 </ul>
             </div>
         </div>
@@ -44,19 +42,24 @@
 
     <script type="text/javascript">
         $(document).ready(function () {
-            setInterval(checkEvents, 3 * 1000);
+            setInterval(function () {
+                checkEvents('?isToday=true', 'notify_today');
+                checkEvents('', 'notify');
+            }, 60 * 1000);
         });
-
-        function checkEvents() {
+        function checkEvents(url, id) {
             $.ajax({
-                url: '/Event/MiniDetails?uid=be4e4da6-1a01-4961-a9f7-81216425abee',
+                url: '/Notify/Info' + url,
                 type: 'get',
                 success: function (data) {
-                    $('#notify').html(data);
+                    if (data > 0) {
+                        $('#' + id).find('span').html(data);
+                    } else {
+                        $('#' + id).find('span').html('');
+                    }
                 }
             });
         }
-
     </script>
 
 
